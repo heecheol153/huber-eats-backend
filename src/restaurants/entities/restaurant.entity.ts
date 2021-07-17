@@ -5,6 +5,12 @@ export class Restaurant {
   @Field(() => String)
   name: string;
 
-  @Field(() => Boolean, { nullable: true })
-  isGood?: boolean; // nullable 이기떼문에 ?르 넣을수있다.
+  @Field(() => Boolean)
+  isVegan: boolean;
+
+  @Field(() => String)
+  address: string;
+
+  @Field(() => String)
+  ownersName: string;
 }
