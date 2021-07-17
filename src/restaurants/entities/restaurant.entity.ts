@@ -6,5 +6,5 @@ export class Restaurant {
   name: string;
 
   @Field(() => Boolean, { nullable: true })
-  isGood?: boolean;
+  isGood?: boolean; // nullable 이기떼문에 ?르 넣을수있다.
 }
