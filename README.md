@@ -2,9 +2,26 @@
 
 The Backend of Huber Eats Clone
 
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
-</p>
+## User Model:
+
+- id
+- createdAt
+- updatedAt
+
+- email
+- password
+- role(client|owner|delivery)
+
+## User CRUD:
+
+- Create Account
+- Log In
+- See Profile
+- Edit Profile
+- Verify Email
+- <p align="center">
+    <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
+  </p>
 
 [circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
 [circleci-url]: https://circleci.com/gh/nestjs/nest
