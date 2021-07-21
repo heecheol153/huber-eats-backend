@@ -24,6 +24,8 @@ export class UsersService {
         // make error
         return { ok: false, error: 'There is a user with that email already' };
       }
+      //this.users.save하기전에 먼저 instance를 생서한다. this.users.create
+      //DB에 저장하기전에 이미 instance를 가짐.
       await this.users.save(this.users.create({ email, password, role }));
       return { ok: true };
     } catch (e) {
