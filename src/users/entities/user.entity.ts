@@ -46,4 +46,15 @@ export class User extends CoreEntity {
       throw new InternalServerErrorException();
     }
   }
+  // 유저가 보내준 PW를 받는다.그리고 checkPassword는 Boolean값으로 분해(resolve)되는 promise로
+  // return할것이다.
+  async checkPassword(aPassword: string): Promise<boolean> {
+    try {
+      const ok = await bcrypt.compare(aPassword, this.password); //compare()는 boolean값을 리턴한다.
+      return ok;
+    } catch (e) {
+      console.log(e); // error가 있으면 console.log()하고
+      throw new InternalServerErrorException(); //throw할것이다.
+    }
+  }
 }
