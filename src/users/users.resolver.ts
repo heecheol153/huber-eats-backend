@@ -3,6 +3,7 @@ import {
   CreateAccountInput,
   CreateAccountOutput,
 } from './dtos/create-account.dto';
+import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 
@@ -25,7 +26,7 @@ export class UsersResolver {
         createAccountInput,
       );
       return {
-        ok: false,
+        ok,
         error,
       };
     } catch (error) {
@@ -35,4 +36,11 @@ export class UsersResolver {
       };
     }
   }
+
+  //CreateAccountInput이라고 했던것처럼
+  @Mutation(() => LoginOutput)
+  async login(@Args('input') loginInput: LoginInput) {}
+  //마지막에 아래처럼 수정하고마침
+  //async login(@Args('input') loginInput: LoginInput): Promise<LoginOutput> {
+  //}
 }
