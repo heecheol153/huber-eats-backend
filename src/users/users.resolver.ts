@@ -22,7 +22,9 @@ export class UsersResolver {
     @Args('input') createAccountInput: CreateAccountInput,
   ): Promise<CreateAccountOutput> {
     try {
-      return this.usersService.createAccount(createAccountInput);
+      const { ok, error } = await this.usersService.createAccount(
+        createAccountInput,
+      );
     } catch (error) {
       return {
         error,
@@ -37,7 +39,8 @@ export class UsersResolver {
   //마지막에 아래처럼 수정하고마침
   async login(@Args('input') loginInput: LoginInput): Promise<LoginOutput> {
     try {
-      return this.usersService.login(loginInput);
+      const { ok, error, token } = await this.usersService.login(loginInput);
+      return { ok, error, token };
     } catch (error) {
       return {
         ok: false,
