@@ -64,8 +64,8 @@ export class UsersService {
       }
       const token = jwt.sign({ id: user.id }, this.config.get('SECRET_KEY'));
       return {
-        ok: false,
-        token: 'lalalalalala', //pw가 맞는지확인위해
+        ok: true,
+        token, //pw가 맞는지확인위해
       };
     } catch (error) {
       return {
