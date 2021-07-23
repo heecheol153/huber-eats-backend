@@ -12,12 +12,8 @@ import { JwtService } from 'src/jwt/jwt.service';
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly users: Repository<User>,
-    private readonly config: ConfigService,
     private readonly jwtService: JwtService,
-  ) {
-    this.jwtService.hello();
-    console.log(this.config.get('SECRET_KEY'));
-  }
+  ) {}
 
   // check new user
   // create user & hash the password
@@ -65,7 +61,7 @@ export class UsersService {
           error: 'Wrong password',
         };
       }
-      const token = jwt.sign({ id: user.id }, this.config.get('SECRET_KEY'));
+      const token = this.jwtService.sign(user.id);
       return {
         ok: true,
         token, //pw가 맞는지확인위해
