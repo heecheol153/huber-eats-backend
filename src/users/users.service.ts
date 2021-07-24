@@ -76,8 +76,13 @@ export class UserService {
   async findById(id: number): Promise<User> {
     return this.users.findOne({ id });
   }
-
-  async editProfile(userId: number, { email, password }: EditProfileInput) {
-    return this.users.update(userId, { email, password });
+  //밑방법은 좋지 않음
+  //  async editProfile(userId: number, { email, password }: EditProfileInput) {
+  async editProfile(userId: number, editProfileInput: EditProfileInput) {
+    //1)console.log(userId, email, password);
+    //2)console.log(editProfileInput);
+    //2)return this.users.update(userId, { email, password });
+    //3)console.log({ ...editProfileInput });db에 undefined데이터를 보내지 않는다.
+    return this.users.update(userId, { ...editProfileInput }); //ES6를 참조
   }
 }
