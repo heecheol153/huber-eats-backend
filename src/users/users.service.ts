@@ -108,4 +108,16 @@ export class UserService {
     }
     return this.users.save(user); //update대신 save를 사용해야 Insert, Update해준다.
   }
+
+  async verifyEmail(code: string) {
+    const verification = await this.verifications.findOne(
+      { code },
+      { relations: ['user'] },
+    );
+    if (verification) {
+      verification.user.verified = true;
+      this.users.save(verification.user);
+    }
+    return false;
+  }
 }
