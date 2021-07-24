@@ -7,6 +7,7 @@ import {
   CreateAccountOutput,
 } from './dtos/create-account.dto';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
+import { UserProfileInput, UserProfileOutput } from './dtos/user-profile.dto';
 import { User } from './entities/user.entity';
 import { UserService } from './users.service';
 
@@ -15,10 +16,10 @@ export class UserResolver {
   constructor(private readonly usersService: UserService) {}
 
   //이것없으면 Query root type must be provided.에러발생함.
-  @Query(() => Boolean)
-  hi() {
-    return true;
-  }
+  //@Query(() => Boolean)
+  //hi() {
+  //  return true;
+  //}
 
   @Mutation(() => CreateAccountOutput)
   async createAccount(
@@ -28,6 +29,10 @@ export class UserResolver {
       const { ok, error } = await this.usersService.createAccount(
         createAccountInput,
       );
+      return {
+        ok,
+        error,
+      };
     } catch (error) {
       return {
         error,
@@ -56,5 +61,27 @@ export class UserResolver {
   @UseGuards(AuthGuard)
   me(@AuthUser() authUser: User) {
     return authUser;
+  }
+
+  @UseGuards(AuthGuard)
+  @Query(() => UserProfileOutput)
+  async userProfile(
+    @Args() userProfileInput: UserProfileInput,
+  ): Promise<UserProfileOutput> {
+    try {
+      const user = await this.usersService.findById(userProfileInput.userId);
+      if (!user) {
+        throw Error();
+      }
+      return {
+        ok: true,
+        user,
+      };
+    } catch (e) {
+      return {
+        error: 'User Not Found',
+        ok: false,
+      };
+    }
   }
 }
