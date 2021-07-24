@@ -1,4 +1,6 @@
+import { UseGuards } from '@nestjs/common';
 import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
+import { AuthGuard } from 'src/auth/auth.guard';
 import {
   CreateAccountInput,
   CreateAccountOutput,
@@ -50,12 +52,6 @@ export class UserResolver {
   }
 
   @Query(() => User)
-  me(@Context() context) {
-    if (!context.user) {
-      return;
-    } else {
-      return context.user;
-    }
-    //console.log(context);여기에서user를 찾으면 id,createdAt,updatedAt,email.password가보인다.
-  }
+  @UseGuards(AuthGuard)
+  me() {}
 }
