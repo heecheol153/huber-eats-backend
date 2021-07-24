@@ -78,11 +78,22 @@ export class UserService {
   }
   //밑방법은 좋지 않음
   //  async editProfile(userId: number, { email, password }: EditProfileInput) {
-  async editProfile(userId: number, editProfileInput: EditProfileInput) {
+  async editProfile(
+    userId: number,
+    { email, password }: EditProfileInput,
+  ): Promise<User> {
     //1)console.log(userId, email, password);
     //2)console.log(editProfileInput);
     //2)return this.users.update(userId, { email, password });
     //3)console.log({ ...editProfileInput });db에 undefined데이터를 보내지 않는다.
-    return this.users.update(userId, { ...editProfileInput }); //ES6를 참조
+    //return this.users.update(userId, { ...editProfileInput }); //ES6를 참조
+    const user = await this.users.findOne(userId);
+    if (email) {
+      user.email = email;
+    }
+    if (password) {
+      user.password = password;
+    }
+    return this.users.save(user); //update대신 save를 사용해야 Insert, Update해준다.
   }
 }
