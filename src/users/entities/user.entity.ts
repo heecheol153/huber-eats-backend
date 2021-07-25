@@ -27,7 +27,7 @@ export class User extends CoreEntity {
   @IsEmail()
   email: string;
 
-  @Column()
+  @Column({ select: false })
   @Field(() => String)
   password: string;
 
@@ -37,18 +37,20 @@ export class User extends CoreEntity {
   role: UserRole;
 
   @Column({ default: false })
-  @Field((type) => Boolean)
+  @Field(() => Boolean)
   verified: boolean;
 
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword(): Promise<void> {
-    try {
-      this.password = await bcrypt.hash(this.password, 10);
-    } catch (e) {
-      console.log(e);
-      //error가있으면 InternalServerErrorException()를 throw할것이다.
-      throw new InternalServerErrorException();
+    if (this.password) {
+      try {
+        this.password = await bcrypt.hash(this.password, 10);
+      } catch (e) {
+        console.log(e);
+        //error가있으면 InternalServerErrorException()를 throw할것이다.
+        throw new InternalServerErrorException();
+      }
     }
   }
   // 유저가 보내준 PW를 받는다.그리고 checkPassword는 Boolean값으로 분해(resolve)되는 promise로

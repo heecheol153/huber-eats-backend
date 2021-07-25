@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Entity, Repository } from 'typeorm';
 import { CreateAccountInput } from './dtos/create-account.dto';
 import { LoginInput } from './dtos/login.dto';
 import { User } from './entities/user.entity';
@@ -56,7 +56,11 @@ export class UserService {
     // check if the password is correct
     // make a JWT and give it to the user
     try {
-      const user = await this.users.findOne({ email });
+      const user = await this.users.findOne(
+        { email },
+        { select: ['password'] },
+        //{ select: ['id', 'password'] },id가 undefined이기때문에 id select처리했다.
+      );
       if (!user) {
         return {
           ok: false,
@@ -70,6 +74,7 @@ export class UserService {
           error: 'Wrong password',
         };
       }
+      //console.log(user);
       const token = this.jwtService.sign(user.id);
       return {
         ok: true,
@@ -109,15 +114,23 @@ export class UserService {
     return this.users.save(user); //update대신 save를 사용해야 Insert, Update해준다.
   }
 
-  async verifyEmail(code: string) {
-    const verification = await this.verifications.findOne(
-      { code },
-      { relations: ['user'] },
-    );
-    if (verification) {
-      verification.user.verified = true;
-      this.users.save(verification.user);
+  async verifyEmail(code: string): Promise<boolean> {
+    try {
+      const verification = await this.verifications.findOne(
+        { code },
+        { relations: ['user'] },
+      );
+      if (verification) {
+        verification.user.verified = true;
+        console.log(verification.user);
+        this.users.save(verification.user);
+        return true;
+      }
+      //return false;
+      throw new Error();
+    } catch (e) {
+      console.log(e);
+      return false;
     }
-    return false;
   }
 }
