@@ -145,7 +145,8 @@ export class UserService {
       if (verification) {
         verification.user.verified = true;
         //console.log(verification.user);
-        this.users.save(verification.user);
+        await this.users.save(verification.user);
+        await this.verifications.delete(verification.id); //인중후verification을 지워야함.
         //return true;
         return { ok: true };
       }
