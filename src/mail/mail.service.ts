@@ -2,7 +2,7 @@ import got from 'got';
 import * as FormData from 'form-data';
 import { Inject, Injectable } from '@nestjs/common';
 import { CONFIG_OPTIONS } from 'src/common/common.constants';
-import { EmailVar, MailModuleOptions } from './mail.interfaces';
+import { MailModuleOptions } from './mail.interfaces';
 
 @Injectable()
 export class MailService {
@@ -23,7 +23,9 @@ export class MailService {
     );
     form.append('to', `heecheol.jeong87@gmail.com`);
     form.append('subject', subject);
-    form.append('text', content);
+    form.append('template', 'verify-email');
+    form.append('v:code', 'asasas');
+    form.append('v:username', 'heecheol!!!');
     const response = await got(
       `https://api.mailgun.net/v3/${this.options.domain}/messages`,
       {
