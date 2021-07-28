@@ -12,6 +12,7 @@ import { EditProfileInput, EditProfileOutput } from './dtos/edit-profile.dto';
 import { Verification } from './entities/verification.entity';
 import { VerifyEmailOutput } from './dtos/verify-email.dto';
 import { UserProfileOutput } from './dtos/user-profile.dto';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class UserService {
@@ -20,6 +21,7 @@ export class UserService {
     @InjectRepository(Verification)
     private readonly verifications: Repository<Verification>,
     private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
   ) {}
 
   // check new user
@@ -30,7 +32,7 @@ export class UserService {
     password,
     role,
   }: CreateAccountInput): Promise<CreateAccountOutput> {
-    //}: CreateAccountInput): Promise<{ ok: boolean; error?: string }> {
+    //}: CreateAccountInput): Promise<CreateAccountOutput> {
     try {
       const exists = await this.users.findOne({ email });
       if (exists) {
@@ -47,6 +49,7 @@ export class UserService {
           user,
         }),
       );
+      //this.mailService.sendVerificationEmail(user.email, verification.code);
       return { ok: true };
     } catch (e) {
       //make error
@@ -55,7 +58,7 @@ export class UserService {
   }
 
   async login({ email, password }: LoginInput): Promise<LoginOutput> {
-    //}: LoginInput): Promise<{ ok: boolean; error?: string; token?: string }> {
+    //}: LoginInput): Promise<LoginOutput> {
     // find the user with the email
     // check if the password is correct
     // make a JWT and give it to the user
@@ -63,7 +66,6 @@ export class UserService {
       const user = await this.users.findOne(
         { email },
         { select: ['password'] },
-        //{ select: ['id', 'password'] },id가 undefined이기때문에 id select처리했다.
       );
       if (!user) {
         return {
@@ -105,6 +107,7 @@ export class UserService {
       return { ok: false, error: 'User Not Found' };
     }
   }
+
   //밑방법은 좋지 않음
   //  async editProfile(userId: number, { email, password }: EditProfileInput) {
   async editProfile(
@@ -131,10 +134,10 @@ export class UserService {
         ok: true,
       };
     } catch (error) {
-      return { ok: false, error: 'Could not update prifile.' };
+      return { ok: false, error: 'Could not update profile.' };
     }
-    //return this.users.save(user); //update대신 save를 사용해야 Insert, Update해준다.
   }
+  //return this.users.save(user); //update대신 save를 사용해야 Insert, Update해준다.
 
   async verifyEmail(code: string): Promise<VerifyEmailOutput> {
     try {
@@ -147,15 +150,14 @@ export class UserService {
         //console.log(verification.user);
         await this.users.save(verification.user);
         await this.verifications.delete(verification.id); //인중후verification을 지워야함.
-        //return true;
         return { ok: true };
       }
-      //return false;
       return { ok: false, error: 'Verification not found.' };
-      //throw new Error();
     } catch (error) {
       //console.log(error);
       return { ok: false, error };
+      //return { ok: false, error: 'Verification not found.' };
+      //throw new Error();
     }
   }
 }
