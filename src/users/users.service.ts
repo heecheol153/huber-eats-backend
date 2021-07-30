@@ -24,6 +24,7 @@ export class UserService {
     private readonly mailService: MailService,
   ) {}
 
+  //createAccount메소드
   async createAccount({
     email,
     password,
