@@ -16,3 +16,4 @@ export class JwtService {
     return jwt.verify(token, this.options.privateKey);
   }
 }
+//위에 sign,verify 두개의 메소드가 있다.
