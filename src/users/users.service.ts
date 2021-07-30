@@ -24,48 +24,37 @@ export class UserService {
     private readonly mailService: MailService,
   ) {}
 
-  // check new user
-  // create user & hash the password
-  // return ok
   async createAccount({
     email,
     password,
     role,
   }: CreateAccountInput): Promise<CreateAccountOutput> {
-    //}: CreateAccountInput): Promise<CreateAccountOutput> {
     try {
       const exists = await this.users.findOne({ email });
       if (exists) {
-        // make error
         return { ok: false, error: 'There is a user with that email already' };
       }
-      //this.users.save하기전에 먼저 instance를 생서한다. this.users.create
-      //DB에 저장하기전에 이미 instance를 가짐.
       const user = await this.users.save(
         this.users.create({ email, password, role }),
       );
-      await this.verifications.save(
+      const verification = await this.verifications.save(
         this.verifications.create({
           user,
         }),
       );
-      //this.mailService.sendVerificationEmail(user.email, verification.code);
+      this.mailService.sendVerificationEmail(user.email, verification.code);
       return { ok: true };
     } catch (e) {
-      //make error
       return { ok: false, error: "Couldn't create account" };
     }
   }
 
   async login({ email, password }: LoginInput): Promise<LoginOutput> {
-    //}: LoginInput): Promise<LoginOutput> {
-    // find the user with the email
-    // check if the password is correct
     // make a JWT and give it to the user
     try {
       const user = await this.users.findOne(
         { email },
-        { select: ['password'] },
+        { select: ['id', 'password'] },
       );
       if (!user) {
         return {
@@ -80,11 +69,11 @@ export class UserService {
           error: 'Wrong password',
         };
       }
-      //console.log(user);
+
       const token = this.jwtService.sign(user.id);
       return {
         ok: true,
-        token, //pw가 맞는지확인위해
+        token,
       };
     } catch (error) {
       return {
@@ -108,23 +97,18 @@ export class UserService {
     }
   }
 
-  //밑방법은 좋지 않음
-  //  async editProfile(userId: number, { email, password }: EditProfileInput) {
   async editProfile(
     userId: number,
     { email, password }: EditProfileInput,
   ): Promise<EditProfileOutput> {
-    //1)console.log(userId, email, password);
-    //2)console.log(editProfileInput);
-    //2)return this.users.update(userId, { email, password });
-    //3)console.log({ ...editProfileInput });db에 undefined데이터를 보내지 않는다.
-    //return this.users.update(userId, { ...editProfileInput }); //ES6를 참조
     try {
       const user = await this.users.findOne(userId);
       if (email) {
         user.email = email;
         user.verified = false;
-        await this.verifications.save(this.verifications.create({ user }));
+        const verification = await this.verifications.save(
+          this.verifications.create({ user }),
+        );
       }
       if (password) {
         user.password = password;
@@ -137,7 +121,6 @@ export class UserService {
       return { ok: false, error: 'Could not update profile.' };
     }
   }
-  //return this.users.save(user); //update대신 save를 사용해야 Insert, Update해준다.
 
   async verifyEmail(code: string): Promise<VerifyEmailOutput> {
     try {
@@ -147,17 +130,15 @@ export class UserService {
       );
       if (verification) {
         verification.user.verified = true;
-        //console.log(verification.user);
+        console.log(verification.user);
         await this.users.save(verification.user);
-        await this.verifications.delete(verification.id); //인중후verification을 지워야함.
+        await this.verifications.delete(verification.id);
         return { ok: true };
       }
       return { ok: false, error: 'Verification not found.' };
     } catch (error) {
-      //console.log(error);
+      console.log(error);
       return { ok: false, error };
-      //return { ok: false, error: 'Verification not found.' };
-      //throw new Error();
     }
   }
 }

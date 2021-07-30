@@ -6,8 +6,11 @@ module.exports = {
   },
   plugins: ['@typescript-eslint/eslint-plugin'],
   extends: [
+    'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
+    'prettier',
+    'prettier/@typescript-eslint',
   ],
   root: true,
   env: {
@@ -16,9 +19,14 @@ module.exports = {
   },
   ignorePatterns: ['.eslintrc.js'],
   rules: {
+    semi: ['error', 'never'],
+    quotes: [2, 'single'],
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': ['off'],
+    '@typescript-eslint/no-empty-function': ['off'],
   },
 };

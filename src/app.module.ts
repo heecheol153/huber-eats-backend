@@ -9,11 +9,11 @@ import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
-import { CommonModule } from './common/common.module';
+import { CommonModule } from './common/common.module'; //chk
 import { User } from './users/entities/user.entity';
 import { JwtModule } from './jwt/jwt.module';
 import { JwtMiddleware } from './jwt/jwt.middleware';
-import { AuthModule } from './auth/auth.module';
+import { AuthModule } from './auth/auth.module'; //chk
 import { Verification } from './users/entities/verification.entity';
 import { MailModule } from './mail/mail.module';
 
@@ -31,9 +31,9 @@ import { MailModule } from './mail/mail.module';
         DB_PASSWORD: Joi.string().required(),
         DB_NAME: Joi.string().required(),
         PRIVATE_KEY: Joi.string().required(),
-        MAILGUN_API_KEY: Joi.string().required(),
-        MAILGUN_DOMAIN_NAME: Joi.string().required(),
-        MAILGUN_FROM_EMAIL: Joi.string().required(),
+        MAILGUN_API_KEY: Joi.string().required(), //chk0
+        MAILGUN_DOMAIN_NAME: Joi.string().required(), //chk0
+        MAILGUN_FROM_EMAIL: Joi.string().required(), //chk0
       }),
     }),
     TypeOrmModule.forRoot({

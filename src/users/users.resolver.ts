@@ -13,7 +13,7 @@ import { VerifyEmailInput, VerifyEmailOutput } from './dtos/verify-email.dto';
 import { User } from './entities/user.entity';
 import { UserService } from './users.service';
 
-@Resolver(() => User)
+@Resolver((of) => User)
 export class UserResolver {
   constructor(private readonly usersService: UserService) {}
 
@@ -23,7 +23,7 @@ export class UserResolver {
   //  return true;
   //}
 
-  @Mutation(() => CreateAccountOutput)
+  @Mutation((returns) => CreateAccountOutput)
   async createAccount(
     @Args('input') createAccountInput: CreateAccountInput,
   ): Promise<CreateAccountOutput> {
@@ -31,29 +31,29 @@ export class UserResolver {
   }
 
   //CreateAccountInput이라고 했던것처럼
-  @Mutation(() => LoginOutput)
+  @Mutation((returns) => LoginOutput)
   //async login(@Args('input') loginInput: LoginInput) {}
   //마지막에 아래처럼 수정하고마침
   async login(@Args('input') loginInput: LoginInput): Promise<LoginOutput> {
     return this.usersService.login(loginInput);
   }
 
-  @Query(() => User)
+  @Query((returns) => User)
   @UseGuards(AuthGuard)
   me(@AuthUser() authUser: User) {
     return authUser;
   }
 
   @UseGuards(AuthGuard)
-  @Query(() => UserProfileOutput)
+  @Query((returns) => UserProfileOutput)
   async userProfile(
     @Args() userProfileInput: UserProfileInput,
   ): Promise<UserProfileOutput> {
     return this.usersService.findById(userProfileInput.userId);
   }
 
+  @Mutation((returns) => EditProfileOutput)
   @UseGuards(AuthGuard)
-  @Mutation(() => EditProfileOutput)
   async editProfile(
     @AuthUser() authUser: User,
     @Args('input') editProfileInput: EditProfileInput,
@@ -61,8 +61,8 @@ export class UserResolver {
     return this.usersService.editProfile(authUser.id, editProfileInput);
   }
 
-  @Mutation(() => VerifyEmailOutput)
-  verifyEmail(
+  @Mutation((returns) => VerifyEmailOutput)
+  async verifyEmail(
     @Args('input') { code }: VerifyEmailInput,
   ): Promise<VerifyEmailOutput> {
     return this.usersService.verifyEmail(code);

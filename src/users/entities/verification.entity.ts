@@ -9,13 +9,14 @@ import { User } from './user.entity';
 @Entity()
 export class Verification extends CoreEntity {
   @Column()
-  @Field(() => String)
+  @Field((type) => String)
   code: string;
 
-  @OneToOne(() => User, { onDelete: 'CASCADE' })
+  @OneToOne((type) => User, { onDelete: 'CASCADE' })
   @JoinColumn()
   user: User;
 
+  //여기서 hook을 작성한다.
   @BeforeInsert()
   createCode(): void {
     this.code = uuidv4();
