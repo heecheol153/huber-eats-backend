@@ -67,7 +67,21 @@ describe('UserService', () => {
   //이것들은 그냥 빈 함수가 된다 즉 arrow function이 될것이다. 이름을 복사하여todo에 넣는다.
   //it.todo('createAccount');
   describe('createAccount', () => {
-    it('should fail if user exists', () => {});
+    it('should fail if user exists', async () => {
+      usersRepository.findOne.mockResolvedValue({
+        id: 1,
+        email: 'alalalalalalalalala',
+      });
+      const result = await service.createAccount({
+        email: '',
+        password: '',
+        role: 0,
+      });
+      expect(result).toMatchObject({
+        ok: false,
+        error: 'There is a user with that email already',
+      });
+    });
   });
 
   it.todo('login');
