@@ -86,13 +86,13 @@ export class UserService {
 
   async findById(id: number): Promise<UserProfileOutput> {
     try {
-      const user = await this.users.findOne({ id });
-      if (user) {
-        return {
-          ok: true,
-          user: user,
-        };
-      }
+      //const user = await this.users.findOne({ id });
+      //찾으면 return할거고,못찾으면 error가 나옴
+      const user = await this.users.findOneOrFail({ id }); //exception이니error를 throw할거다.
+      return {
+        ok: true,
+        user,
+      };
     } catch (error) {
       return { ok: false, error: 'User Not Found' };
     }

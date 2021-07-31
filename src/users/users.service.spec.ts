@@ -6,7 +6,6 @@ import { MailService } from 'src/mail/mail.service';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { Verification } from './entities/verification.entity';
-import { UserResolver } from './users.resolver';
 import { UserService } from './users.service';
 
 //fn은 mock함수를 만든다.가짜함수. object
@@ -14,6 +13,7 @@ const mockRepository = () => ({
   findOne: jest.fn(),
   save: jest.fn(),
   create: jest.fn(),
+  findOneOrFail: jest.fn(),
 });
 
 //jwt
@@ -132,7 +132,7 @@ describe('UserService', () => {
     it('should fail on exception', async () => {
       usersRepository.findOne.mockRejectedValue(new Error());
       const result = await service.createAccount(createAccountArgs);
-      console.log(result); // ==>{ ok: false, error: "Couldn't create account" }
+      //console.log(result); // ==>{ ok: false, error: "Couldn't create account" }
       expect(result).toEqual({ ok: false, error: "Couldn't create account" });
     });
   });
@@ -164,7 +164,7 @@ describe('UserService', () => {
       };
       usersRepository.findOne.mockResolvedValue(mockedUser);
       const result = await service.login(loginArgs);
-      console.log(result); // { ok: false, error: 'Wrong password' }
+      //console.log(result); // { ok: false, error: 'Wrong password' }
       expect(result).toEqual({ ok: false, error: 'Wrong password' });
     });
 
@@ -175,13 +175,30 @@ describe('UserService', () => {
       };
       usersRepository.findOne.mockResolvedValue(mockedUser);
       const result = await service.login(loginArgs);
-      console.log(result); //{ ok: true, token: 'signed-token-baby' }
+      //console.log(result); //{ ok: true, token: 'signed-token-baby' }
       expect(jwtService.sign).toHaveBeenCalledTimes(1);
       expect(jwtService.sign).toHaveBeenCalledWith(expect.any(Number));
-      expect(result).toEqual();
+      expect(result).toEqual({ ok: true, token: 'signed-token-baby' });
     });
   });
-  it.todo('findById');
-  it.todo('editProfile');
+
+  describe('findById', () => {
+    const findByIdArgs = {
+      id: 1,
+    };
+    it('should find an exists user', async () => {
+      usersRepository.findOneOrFail.mockResolvedValue(findByIdArgs);
+      const result = await service.findById(1);
+      expect(result).toEqual({ ok: true, user: findByIdArgs });
+    });
+
+    it('should fail if no user is found', async () => {
+      usersRepository.findOneOrFail.mockRejectedValue(new Error());
+      const result = await service.findById(1);
+      expect(result).toEqual({ ok: false, error: 'User Not Found' });
+    });
+  });
+  describe('editProfile', () => {});
+
   it.todo('verifyEmail');
 });
