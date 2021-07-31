@@ -1,4 +1,3 @@
-import { PartialType } from '@nestjs/graphql';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { JwtService } from 'src/jwt/jwt.service';
@@ -8,12 +7,12 @@ import { User } from './entities/user.entity';
 import { Verification } from './entities/verification.entity';
 import { UserService } from './users.service';
 
-//fn은 mock함수를 만든다.가짜함수.
-const mockRepository = {
+//fn은 mock함수를 만든다.가짜함수. object
+const mockRepository = () => ({
   findOne: jest.fn(),
   save: jest.fn(),
   create: jest.fn(),
-};
+});
 
 //jwt
 const mockJwtService = {
@@ -33,6 +32,7 @@ type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 describe('UserService', () => {
   let service: UserService;
   let usersRepository: MockRepository<User>;
+  let verificationsRepository: MockRepository<Verification>;
 
   beforeAll(async () => {
     const module = await Test.createTestingModule({
@@ -40,11 +40,11 @@ describe('UserService', () => {
         UserService,
         {
           provide: getRepositoryToken(User),
-          useValue: mockRepository,
+          useValue: mockRepository(),
         },
         {
           provide: getRepositoryToken(Verification),
-          useValue: mockRepository,
+          useValue: mockRepository(),
         },
         {
           provide: JwtService,
@@ -58,6 +58,7 @@ describe('UserService', () => {
     }).compile();
     service = module.get<UserService>(UserService);
     usersRepository = module.get(getRepositoryToken(User));
+    verificationsRepository = module.get(getRepositoryToken(Verification));
   });
 
   it('should be defined', () => {
@@ -67,20 +68,30 @@ describe('UserService', () => {
   //이것들은 그냥 빈 함수가 된다 즉 arrow function이 될것이다. 이름을 복사하여todo에 넣는다.
   //it.todo('createAccount');
   describe('createAccount', () => {
+    const createAccountArgs = {
+      email: '',
+      password: '',
+      role: 0,
+    };
     it('should fail if user exists', async () => {
       usersRepository.findOne.mockResolvedValue({
         id: 1,
-        email: 'alalalalalalalalala',
-      });
-      const result = await service.createAccount({
         email: '',
-        password: '',
-        role: 0,
       });
+      const result = await service.createAccount(createAccountArgs);
       expect(result).toMatchObject({
         ok: false,
         error: 'There is a user with that email already',
       });
+    });
+    it('should create a new user', async () => {
+      usersRepository.findOne.mockResolvedValueOnce(undefined);
+      usersRepository.create.mockReturnValue(createAccountArgs);
+      await service.createAccount(createAccountArgs);
+      expect(usersRepository.create).toHaveBeenCalledTimes(1);
+      expect(usersRepository.create).toHaveBeenCalledWith(createAccountArgs);
+      expect(usersRepository.save).toHaveBeenCalledTimes(1);
+      expect(usersRepository.save).toHaveBeenCalledWith(createAccountArgs);
     });
   });
 
