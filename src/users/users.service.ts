@@ -79,7 +79,7 @@ export class UserService {
     } catch (error) {
       return {
         ok: false,
-        error,
+        error: "Can't log user in.",
       };
     }
   }
@@ -110,6 +110,7 @@ export class UserService {
         const verification = await this.verifications.save(
           this.verifications.create({ user }),
         );
+        this.mailService.sendVerificationEmail(user.email, verification.code); //forgot
       }
       if (password) {
         user.password = password;
@@ -138,8 +139,8 @@ export class UserService {
       }
       return { ok: false, error: 'Verification not found.' };
     } catch (error) {
-      console.log(error);
-      return { ok: false, error };
+      //console.log(error);
+      return { ok: false, error: 'Could not verify email.' };
     }
   }
 }
