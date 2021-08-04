@@ -257,7 +257,55 @@ describe('UserModule (e2e)', () => {
     });
   });
 
-  it.todo('me');
+  describe('me', () => {
+    it('should find my profile', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set('X-JWT', jwtToken)
+        .send({
+          query: `
+          {
+            me {
+              email
+            }
+          }
+        `,
+        })
+        .expect(200)
+        .expect((res) => {
+          //console.log(res.body);
+          const {
+            body: {
+              data: {
+                me: { email },
+              },
+            },
+          } = res;
+          expect(email).toBe(testUser.email);
+        });
+    });
+    it('should not allow logged out user', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send({
+          query: `
+        {
+          me {
+            email
+          }
+        }
+      `,
+        })
+        .expect(200)
+        .expect((res) => {
+          const {
+            body: { errors },
+          } = res;
+          const [error] = errors;
+          expect(error.message).toBe('Forbidden resource'); //message는 error message에서 복붙.
+        });
+    });
+  });
 
   it.todo('verifyEmail');
 
