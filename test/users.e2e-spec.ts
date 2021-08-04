@@ -2,7 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
-import { getConnection } from 'typeorm';
+import { getConnection, getRepository, Repository } from 'typeorm';
+import { User } from 'src/users/entities/user.entity';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { ok } from 'assert/strict';
 
 jest.mock('got', () => {
   return {
@@ -19,6 +22,7 @@ const testUser = {
 
 describe('UserModule (e2e)', () => {
   let app: INestApplication;
+  let usersRepository: Repository<User>; //1.class는 Repository이다
   let jwtToken: string; //7.
 
   beforeAll(async () => {
@@ -26,6 +30,9 @@ describe('UserModule (e2e)', () => {
       imports: [AppModule],
     }).compile();
     app = module.createNestApplication();
+    usersRepository = module.get<Repository<User>>(getRepositoryToken(User));
+    //2. 이렇게하면 user들의 repository를 받아올수있다. get에서원하는 type을 명시할수있다.(<Repository<User>>)
+    //usersRepository를 가지고올수있으니,userProfile을 하기전에 DB에접속가능.
     await app.init();
   });
 
@@ -127,7 +134,7 @@ describe('UserModule (e2e)', () => {
           expect(login.ok).toBe(true);
           expect(login.error).toBe(null);
           expect(login.token).toEqual(expect.any(String));
-          jwtToken = login.token; //8.
+          jwtToken = login.token;
         });
     });
     it('should not be able to login with wrong credentials', () => {
@@ -162,8 +169,97 @@ describe('UserModule (e2e)', () => {
         });
     });
   });
-  it.todo('userProfile');
+
+  //3.beforeAll과같은방식
+  describe('userProfile', () => {
+    let userId: number;
+    //userProfile의 모든테스트이전에DB를 들어다본다.뭐가나오는지 console.log()를 실행
+    beforeAll(async () => {
+      //console.log(await usersRepository.find());
+      const [user] = await usersRepository.find(); //배열의 첫번째요소만 뽑아낸다.
+      userId = user.id;
+    });
+    it("should see a user's profile", () => {
+      return (
+        request(app.getHttpServer())
+          .post(GRAPHQL_ENDPOINT)
+          .set('X-JWT', jwtToken) //.post를 호출한다음 .set을 호출하자! 이게 header임. value는 token or jwtToken이라야함.
+          //이것이 superTest를 사용해서header를 set하는 방법이다.
+          .send({
+            //graphql로 부터받은 ID가 이query를 부르는데 사용한것과 동일해야함...
+            query: `
+          {
+            userProfile(userID:${userId}){
+              ok
+              error
+              user {
+                id
+              }
+            }
+          }
+          `,
+          })
+          .expect(200)
+          .expect((res) => {
+            const {
+              body: {
+                data: {
+                  userProfile: {
+                    ok,
+                    error,
+                    user: { id },
+                  },
+                },
+              },
+            } = res;
+            //console.log(res.body);
+            expect(ok).toBe(true);
+            expect(error).toBe(null);
+            expect(id).toBe(userId);
+          })
+      );
+    });
+    it('should not find a profile', () => {
+      return (
+        request(app.getHttpServer())
+          .post(GRAPHQL_ENDPOINT)
+          .set('X-JWT', jwtToken) //.post를 호출한다음 .set을 호출하자! 이게 header임. value는 token or jwtToken이라야함.
+          //이것이 superTest를 사용해서header를 set하는 방법이다.
+          .send({
+            //graphql로 부터받은 ID가 이query를 부르는데 사용한것과 동일해야함...
+            query: `
+          {
+            userProfile(userID:333){
+              ok
+              error
+              user {
+                id
+              }
+            }
+          }
+          `,
+          })
+          .expect(200)
+          .expect((res) => {
+            const {
+              body: {
+                data: {
+                  userProfile: { ok, error, user },
+                },
+              },
+            } = res;
+            //console.log(res.body);
+            expect(ok).toBe(false);
+            expect(error).toBe('User not found');
+            expect(user).toBe(null);
+          })
+      );
+    });
+  });
+
   it.todo('me');
+
   it.todo('verifyEmail');
+
   it.todo('editProfile');
 });
