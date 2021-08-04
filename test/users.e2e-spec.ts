@@ -2,6 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
+import { getConnection } from 'typeorm';
+
+const GRAPHQL_ENDPOINT = '/graphql';
 
 describe('UserModule (e2e)', () => {
   let app: INestApplication;
@@ -10,15 +13,19 @@ describe('UserModule (e2e)', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
-
     app = module.createNestApplication();
     await app.init();
   });
 
-  it.todo('me');
+  afterAll(async () => {
+    await getConnection().dropDatabase();
+    app.close();
+  });
+
+  it.todo('can createAccount');
   it.todo('userProfile');
-  it.todo('createAccount');
   it.todo('login');
-  it.todo('editProfile');
+  it.todo('me');
   it.todo('verifyEmail');
+  it.todo('editProfile');
 });
