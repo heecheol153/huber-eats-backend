@@ -79,7 +79,7 @@ export class UserService {
     } catch (error) {
       return {
         ok: false,
-        error: "Can't log user in.",
+        error,
       };
     }
   }
@@ -88,10 +88,10 @@ export class UserService {
     try {
       //const user = await this.users.findOne({ id });
       //찾으면 return할거고,못찾으면 error가 나옴
-      const user = await this.users.findOneOrFail({ id }); //exception이니error를 throw할거다.
+      const user = await this.users.findOne({ id }); //exception이니error를 throw할거다.
       return {
         ok: true,
-        user,
+        user: user,
       };
     } catch (error) {
       return { ok: false, error: 'User Not Found' };
@@ -134,7 +134,7 @@ export class UserService {
       );
       if (verification) {
         verification.user.verified = true;
-        console.log(verification.user);
+        //console.log(verification.user);
         await this.users.save(verification.user);
         await this.verifications.delete(verification.id);
         return { ok: true };

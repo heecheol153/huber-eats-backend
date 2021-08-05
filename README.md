@@ -2,7 +2,14 @@
 
 The Backend of Huber Eats Clone
 
-## User Model:
+## Restaurant Model:
+
+- name
+- category
+- address
+- coverImage
+
+## User Model
 
 - id
 - createdAt
