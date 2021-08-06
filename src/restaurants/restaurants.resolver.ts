@@ -1,6 +1,8 @@
+import { SetMetadata } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { AuthUser } from 'src/auth/auth-user.decorator';
-import { User } from 'src/users/entities/user.entity';
+import { Role } from 'src/auth/role.decorator';
+import { User, UserRole } from 'src/users/entities/user.entity';
 import {
   CreateRestaurantInput,
   CreateRestaurantOutput,
@@ -13,6 +15,8 @@ export class RestaurantResolver {
   constructor(private readonly restaurantService: RestaurantService) {}
 
   @Mutation((retruns) => CreateRestaurantOutput)
+  @Role(['Owner'])
+  //@SetMetadata("roles", UserRole.Owner)
   async createRestaurant(
     @AuthUser() authUser: User, // restaurant의owner는 로그인한유저가 된다.
     @Args('input') createRestaurantInput: CreateRestaurantInput,
