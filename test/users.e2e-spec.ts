@@ -2,10 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
-import { getConnection, getRepository, Repository } from 'typeorm';
-import { User } from 'src/users/entities/user.entity';
+import { getConnection, Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { ok } from 'assert/strict';
+import { User } from 'src/users/entities/user.entity';
 import { Verification } from 'src/users/entities/verification.entity';
 
 jest.mock('got', () => {
@@ -257,7 +256,7 @@ describe('UserModule (e2e)', () => {
         });
     });
     it('should not allow logged out user', () => {
-      return privateTest(`
+      return publicTest(`
         {
           me {
             email
@@ -300,8 +299,8 @@ describe('UserModule (e2e)', () => {
           } = res;
           expect(ok).toBe(true);
           expect(error).toBe(null);
-        })
-        .then(() => {});
+        });
+      //.then(() => {});
     });
     it('should have new email', () => {
       return privateTest(`
@@ -329,8 +328,8 @@ describe('UserModule (e2e)', () => {
     let verificationCode: string;
     beforeAll(async () => {
       const [verification] = await verificationsRepository.find();
-      console.log('verifyEmail');
-      console.log(verification);
+      //console.log('verifyEmail');
+      //console.log(verification);
       verificationCode = verification.code;
     });
     //여기서 email를 verify함

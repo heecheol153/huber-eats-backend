@@ -79,7 +79,7 @@ export class UserService {
     } catch (error) {
       return {
         ok: false,
-        error,
+        error: "Can't log user in.",
       };
     }
   }
@@ -121,7 +121,7 @@ export class UserService {
         ok: true,
       };
     } catch (error) {
-      console.log(error);
+      //console.log(error);
       return { ok: false, error: 'Could not update profile.' };
     }
   }

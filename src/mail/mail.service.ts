@@ -14,11 +14,11 @@ export class MailService {
     //this.sendEmail('testing', 'test');
   }
 
-  private async sendEmail(
+  async sendEmail(
     subject: string,
     template: string,
     emailVars: EmailVar[],
-  ) {
+  ): Promise<boolean> {
     //console.log(got); mock을 보기위해서
     //console.log(FormData);
     const form = new FormData();
@@ -28,25 +28,29 @@ export class MailService {
       `Heecheol from Huber Eats <mailgun@${this.options.domain}>`,
     );
     //form.append('to', `heecheol@w5.dion.ne.jp`);
-    form.append('to', `heecheol.jeong87@gmail.com`);
+    form.append('to', `heecheol153@gmail.com`);
     form.append('subject', subject);
     form.append('template', template);
     emailVars.forEach((eVar) => form.append(`v:${eVar.key}`, eVar.value));
     //form.append('v:username', 'heecheol!!!');
     //emailVars.forEach((eVar) => form.append(`v:${eVar.key}`, eVar.value));
     try {
-      await got(`https://api.mailgun.net/v3/${this.options.domain}/messages`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Basic ${Buffer.from(
-            `api:${this.options.apiKey}`,
-          ).toString('base64')}`,
+      await got.post(
+        `https://api.mailgun.net/v3/${this.options.domain}/messages`,
+        {
+          //method: 'POST',
+          headers: {
+            Authorization: `Basic ${Buffer.from(
+              `api:${this.options.apiKey}`,
+            ).toString('base64')}`,
+          },
+          body: form,
         },
-        body: form,
-      });
+      );
+      return true;
     } catch (error) {
-      console.log(error);
-      //return false;
+      //console.log(error);
+      return false;
     }
   }
 

@@ -180,6 +180,12 @@ describe('UserService', () => {
       expect(jwtService.sign).toHaveBeenCalledWith(expect.any(Number));
       expect(result).toEqual({ ok: true, token: 'signed-token-baby' });
     });
+
+    it('should fail on exception', async () => {
+      usersRepository.findOne.mockRejectedValue(new Error());
+      const result = await service.login(loginArgs);
+      expect(result).toEqual({ ok: false, error: "Can't log user in." });
+    });
   });
 
   describe('findById', () => {
@@ -198,6 +204,7 @@ describe('UserService', () => {
       expect(result).toEqual({ ok: false, error: 'User Not Found' });
     });
   });
+
   describe('editProfile', () => {
     it('should change email', async () => {
       const oldUser = {
