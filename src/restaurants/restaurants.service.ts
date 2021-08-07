@@ -12,19 +12,19 @@ import {
 } from './dtos/edit-restaurant.dto';
 import { Category } from './entities/category.entity';
 import { Restaurant } from './entities/restaurant.entity';
+import { CategoryRepository } from './repositories/category.repository';
 
 @Injectable()
 export class RestaurantService {
   constructor(
     @InjectRepository(Restaurant)
     private readonly restaurants: Repository<Restaurant>,
-    @InjectRepository(Category)
-    private readonly categories: Repository<Category>,
+    private readonly categories: CategoryRepository,
   ) {
     //console.log('hello how are'.replace(' ', '-'));   replace(/ /g, '-')
   }
 
-  async getOrCreateCategory(name: string): Promise<Category> {
+  async getOrCreate(name: string): Promise<Category> {
     const categoryName = name.trim().toLowerCase();
     const categorySlug = categoryName.replace(/ /g, '-');
     let category = await this.categories.findOne({ slug: categorySlug });
@@ -44,8 +44,8 @@ export class RestaurantService {
       //newRestaurant에서.create를부르면restaurant의 instance를 생성하지만,db에는 저장안함.
       const newRestaurant = this.restaurants.create(createRestaurantInput);
       newRestaurant.owner = owner;
-      //restaurant은 항상category가 있어야함.createRestaurantInput에서 Omit->Pick로수정
-      const category = await this.getOrCreateCategory(
+      //
+      const category = await this.categories.getOrCreate(
         createRestaurantInput.categoryName,
       );
       newRestaurant.category = category;
@@ -81,6 +81,22 @@ export class RestaurantService {
           error: "You can't edit a restaurant that you don't own",
         };
       }
+      let category: Category = null;
+      if (editRestaurantInput.categoryName) {
+        //존재하면 category를 가져옴
+        category = await this.categories.getOrCreate(
+          editRestaurantInput.categoryName,
+        );
+      }
+      //save에서 update할때는 배열로 해줘야함
+      await this.restaurants.save([
+        //이건모든entity를 db에 저장해준다. insert or update
+        {
+          id: editRestaurantInput.restaurantId, // id가 ~.restaurantId 이다
+          ...editRestaurantInput, //editRestaurantInput안에 있는것을 넣으라는뜻..
+          ...(category && { category }), //category가있으면 뒤의category object를리턴한다.
+        },
+      ]);
       return {
         ok: true,
       };
