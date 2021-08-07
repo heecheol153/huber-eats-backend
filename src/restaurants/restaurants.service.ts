@@ -23,19 +23,7 @@ export class RestaurantService {
   ) {
     //console.log('hello how are'.replace(' ', '-'));   replace(/ /g, '-')
   }
-
-  async getOrCreate(name: string): Promise<Category> {
-    const categoryName = name.trim().toLowerCase();
-    const categorySlug = categoryName.replace(/ /g, '-');
-    let category = await this.categories.findOne({ slug: categorySlug });
-    if (!category) {
-      category = await this.categories.save(
-        this.categories.create({ slug: categorySlug, name: categoryName }),
-      );
-    }
-    return category;
-  }
-
+  //category respository에있기때문에 "getOrCreate" 삭제
   async createRestaurant(
     owner: User,
     createRestaurantInput: CreateRestaurantInput,
