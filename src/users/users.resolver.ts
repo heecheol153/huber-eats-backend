@@ -2,6 +2,7 @@ import { UseGuards } from '@nestjs/common';
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { Role } from 'src/auth/role.decorator';
 import {
   CreateAccountInput,
   CreateAccountOutput,
@@ -23,7 +24,9 @@ export class UserResolver {
   //  return true;
   //}
 
+  //public resolever이기때문에 여기엔 metadata가없다.login도 마찬가지.
   @Mutation((returns) => CreateAccountOutput)
+  //@Role(['Delivery'])  잠시test용
   async createAccount(
     @Args('input') createAccountInput: CreateAccountInput,
   ): Promise<CreateAccountOutput> {
@@ -38,15 +41,16 @@ export class UserResolver {
     return this.usersService.login(loginInput);
   }
 
+  //여기me에선 metadata를 사용한다.
   @Query((returns) => User)
-  @UseGuards(AuthGuard)
+  @Role(['Any']) //모든user는 자신의 profile볼수있고(anybody)
   me(@AuthUser() authUser: User) {
     //console.log(authUser);
     return authUser;
   }
 
-  @UseGuards(AuthGuard)
   @Query((returns) => UserProfileOutput)
+  @Role(['Any']) //userProfile에서도 자신의 프로필접근가능.
   async userProfile(
     @Args() userProfileInput: UserProfileInput,
   ): Promise<UserProfileOutput> {
@@ -54,7 +58,7 @@ export class UserResolver {
   }
 
   @Mutation((returns) => EditProfileOutput)
-  @UseGuards(AuthGuard)
+  @Role(['Any'])
   async editProfile(
     @AuthUser() authUser: User,
     @Args('input') editProfileInput: EditProfileInput,

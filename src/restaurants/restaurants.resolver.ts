@@ -15,7 +15,7 @@ export class RestaurantResolver {
   constructor(private readonly restaurantService: RestaurantService) {}
 
   @Mutation((retruns) => CreateRestaurantOutput)
-  @Role(['Owner'])
+  @Role(['Owner']) //owner들만이 restaurant을 만들수있다.
   //@SetMetadata("roles", UserRole.Owner)
   async createRestaurant(
     @AuthUser() authUser: User, // restaurant의owner는 로그인한유저가 된다.
