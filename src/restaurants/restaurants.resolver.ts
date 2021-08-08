@@ -13,6 +13,7 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { Role } from 'src/auth/role.decorator';
 import { User, UserRole } from 'src/users/entities/user.entity';
 import { AllCategoriesOutput } from './dtos/all-categories.dto';
+import { CategoryInput, CategoryOutput } from './dtos/categoy.dto';
 import {
   CreateRestaurantInput,
   CreateRestaurantOutput,
@@ -83,5 +84,10 @@ export class CategoryResolver {
   allCategories(): Promise<AllCategoriesOutput> {
     //모든category를 가져오기때문에input이없다.
     return this.restaurantService.allCategories();
+  }
+
+  @Query((type) => CategoryOutput)
+  category(@Args() categoryInput: CategoryInput): Promise<CategoryOutput> {
+    return this.restaurantService.findCategoryBySlug(categoryInput);
   }
 }
