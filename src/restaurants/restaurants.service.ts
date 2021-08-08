@@ -146,4 +146,7 @@ export class RestaurantService {
       };
     }
   }
+  countRestaurants(category: Category) {
+    return this.restaurants.count({ category }); //category개수를 센다._
+  }
 }
