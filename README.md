@@ -9,9 +9,9 @@ The Backend of Huber Eats Clone
 - See Restaurants (pagination)
 - See Restaurant
 
-- Create Dish
-- Edit Dish
-- Delete Dish
+* Create Dish
+* Edit Dish
+* Delete Dish
 
 ## Restaurant Model:
 
