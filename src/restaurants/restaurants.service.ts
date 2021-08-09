@@ -4,6 +4,7 @@ import { User } from 'src/users/entities/user.entity';
 import { Like, Raw, Repository } from 'typeorm';
 import { AllCategoriesOutput } from './dtos/all-categories.dto';
 import { CategoryInput, CategoryOutput } from './dtos/categoy.dto';
+import { CreateDishInput, CreateDishOutput } from './dtos/create-dish.dto';
 import {
   CreateRestaurantInput,
   CreateRestaurantOutput,
@@ -217,7 +218,9 @@ export class RestaurantService {
     restaurantId,
   }: RestaurantInput): Promise<RestaurantOutput> {
     try {
-      const restaurant = await this.restaurants.findOne(restaurantId);
+      const restaurant = await this.restaurants.findOne(restaurantId, {
+        relations: ['menu'], //retations를 load한다. 즉 relations는 menu가 된다.
+      });
       if (!restaurant) {
         return {
           ok: false,
@@ -258,5 +261,14 @@ export class RestaurantService {
     } catch {
       return { ok: false, error: 'Could not search for restaurants' };
     }
+  }
+
+  async createDish(
+    owner: User,
+    CreateDishInput: CreateDishInput,
+  ): Promise<CreateDishOutput> {
+    return {
+      ok: false,
+    };
   }
 }
