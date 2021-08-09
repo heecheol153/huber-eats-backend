@@ -7,7 +7,7 @@ The Backend of Huber Eats Clone
 - See Categories\*
 - See Restaurants by Category (pagination)\*
 - See Restaurants (pagination)\*
-- See Restaurant
+- See Restaurant\*
 - Search Restaurant
 
 * Create Dish
