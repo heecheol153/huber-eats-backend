@@ -150,21 +150,31 @@ export class RestaurantService {
   countRestaurants(category: Category) {
     return this.restaurants.count({ category }); //category개수를 센다._
   }
-  async findCategoryBySlug({ slug }: CategoryInput): Promise<CategoryOutput> {
+  async findCategoryBySlug({
+    slug,
+    page,
+  }: CategoryInput): Promise<CategoryOutput> {
     try {
-      const category = await this.categories.findOne(
-        { slug },
-        { relations: ['restaurants'] },
-      );
+      const category = await this.categories.findOne({ slug });
       if (!category) {
         return {
           ok: false,
           error: 'Category not found',
         };
       }
+      const restaurants = await this.restaurants.find({
+        where: {
+          category,
+        },
+        take: 25, //웹사이트에들어갔을때,restaurant를 25개만받는다.
+        skip: (page - 1) * 25, //page 2인경우 다음으로나올25개restaurant을 가져온다
+      });
+      category.restaurants = restaurants;
+      const totalResults = await this.countRestaurants(category);
       return {
         ok: true,
         category,
+        totalPages: Math.ceil(totalResults / 25), //정수변환처리
       };
     } catch {
       return {
