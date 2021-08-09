@@ -2,17 +2,21 @@
 
 The Backend of Huber Eats Clone
 
-- Delete Restaurant
+- Create Dish
+- Edit Dish
+- Delete Dish
+- Orders CRUD
+- Orders Subscription (Owner, Customer, Delivery)
+
+- Payments (CRON)
+
+- Delete Restaurant\*
 
 - See Categories\*
 - See Restaurants by Category (pagination)\*
 - See Restaurants (pagination)\*
 - See Restaurant\*
-- Search Restaurant
-
-* Create Dish
-* Edit Dish
-* Delete Dish
+- Search Restaurant\*
 
 ## Restaurant Model:
 
