@@ -16,6 +16,7 @@ import {
   EditRestaurantInput,
   EditRestaurantOutput,
 } from './dtos/edit-restaurant.dto';
+import { RestaurantsInput, RestaurantsOutput } from './dtos/restaurants.dto';
 import { Category } from './entities/category.entity';
 import { Restaurant } from './entities/restaurant.entity';
 import { CategoryRepository } from './repositories/category.repository';
@@ -169,10 +170,11 @@ export class RestaurantService {
         take: 25, //웹사이트에들어갔을때,restaurant를 25개만받는다.
         skip: (page - 1) * 25, //page 2인경우 다음으로나올25개restaurant을 가져온다
       });
-      category.restaurants = restaurants;
+      //category.restaurants = restaurants;
       const totalResults = await this.countRestaurants(category);
       return {
         ok: true,
+        restaurants,
         category,
         totalPages: Math.ceil(totalResults / 25), //정수변환처리
       };
@@ -180,6 +182,28 @@ export class RestaurantService {
       return {
         ok: false,
         error: 'Could not load category',
+      };
+    }
+  }
+
+  async allRestaurants({ page }: RestaurantsInput): Promise<RestaurantsOutput> {
+    try {
+      const [restaurants, totalResults] = await this.restaurants.findAndCount({
+        //findANdCount는array를 return한다.즉array와count까지리턴해준다.
+        //그래서[restaurants, totalResults]로
+        skip: (page - 1) * 25,
+        take: 25,
+      });
+      return {
+        ok: true,
+        results: restaurants,
+        totalPages: Math.ceil(totalResults / 25),
+        totalResults,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: 'Could not load restaurants',
       };
     }
   }

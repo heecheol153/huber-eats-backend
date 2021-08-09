@@ -4,10 +4,11 @@ The Backend of Huber Eats Clone
 
 - Delete Restaurant
 
-- See Categories
-- See Restaurants by Category (pagination)
-- See Restaurants (pagination)
+- See Categories\*
+- See Restaurants by Category (pagination)\*
+- See Restaurants (pagination)\*
 - See Restaurant
+- Search Restaurant
 
 * Create Dish
 * Edit Dish
