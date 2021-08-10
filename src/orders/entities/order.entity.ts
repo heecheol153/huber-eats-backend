@@ -5,11 +5,12 @@ import {
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
+import { IsEnum, IsNumber } from 'class-validator';
 import { CoreEntity } from 'src/common/entities/core.entity';
-import { Dish } from 'src/restaurants/entities/dish.entity';
 import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Column, Entity, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
+import { OrderItem } from './order-item.entity';
 
 export enum OrderStatus {
   Pending = 'Pending', //대기
@@ -45,16 +46,18 @@ export class Order extends CoreEntity {
   })
   restaurant: Restaurant; //relationship과 상관없이 restaurant을 가짐
 
-  @Field((type) => [Dish])
-  @ManyToMany((type) => Dish)
+  @Field((type) => [OrderItem])
+  @ManyToMany((type) => OrderItem)
   @JoinTable()
-  dishes: Dish[]; //order는 dish목록가지고있다.배열이다.
+  items: OrderItem[]; //order는 dish목록가지고있다.배열이다.
 
   @Column({ nullable: true })
   @Field((type) => Float, { nullable: true }) //9.99같은 가격도있으니까
+  @IsNumber()
   total?: number;
 
   @Column({ type: 'enum', enum: OrderStatus })
   @Field((type) => OrderStatus)
+  @IsEnum(OrderStatus)
   status: OrderStatus;
 }
