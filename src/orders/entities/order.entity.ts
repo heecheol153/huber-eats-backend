@@ -50,9 +50,9 @@ export class Order extends CoreEntity {
   @JoinTable()
   dishes: Dish[]; //order는 dish목록가지고있다.배열이다.
 
-  @Column()
-  @Field((type) => Float) //9.99같은 가격도있으니까
-  total: number;
+  @Column({ nullable: true })
+  @Field((type) => Float, { nullable: true }) //9.99같은 가격도있으니까
+  total?: number;
 
   @Column({ type: 'enum', enum: OrderStatus })
   @Field((type) => OrderStatus)
