@@ -2,9 +2,9 @@
 
 The Backend of Huber Eats Clone
 
-- Create Dish
-- Edit Dish
-- Delete Dish
+- Create Dish\*
+- Edit Dish\*
+- Delete Dish\*
 - Orders CRUD
 - Orders Subscription (Owner, Customer, Delivery)
 
