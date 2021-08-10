@@ -24,6 +24,7 @@ import {
   SearchRestaurantOutput,
 } from './dtos/search-restaurant.dto';
 import { Category } from './entities/category.entity';
+import { Dish } from './entities/dish.entity';
 import { Restaurant } from './entities/restaurant.entity';
 import { CategoryRepository } from './repositories/category.repository';
 
@@ -32,6 +33,8 @@ export class RestaurantService {
   constructor(
     @InjectRepository(Restaurant)
     private readonly restaurants: Repository<Restaurant>,
+    @InjectRepository(Dish)
+    private readonly dishes: Repository<Dish>,
     private readonly categories: CategoryRepository,
   ) {
     //console.log('hello how are'.replace(' ', '-'));   replace(/ /g, '-')
@@ -265,10 +268,40 @@ export class RestaurantService {
 
   async createDish(
     owner: User,
-    CreateDishInput: CreateDishInput,
+    createDishInput: CreateDishInput,
   ): Promise<CreateDishOutput> {
-    return {
-      ok: false,
-    };
+    try {
+      const restaurant = await this.restaurants.findOne(
+        //ID로 restaurant을 찾기.
+        createDishInput.restaurantId,
+      );
+      if (!restaurant) {
+        //못 찾으면
+        return {
+          ok: false,
+          error: 'Restauran not found',
+        };
+      }
+      if (owner.id !== restaurant.ownerId) {
+        //ID가 같지 않다면
+        return {
+          ok: false,
+          error: "You can't do that.",
+        };
+      }
+      await this.dishes.save(
+        this.dishes.create({ ...createDishInput, restaurant }),
+      );
+      //console.log(dish);
+      return {
+        ok: true,
+      };
+    } catch (error) {
+      console.log(error);
+      return {
+        ok: false,
+        error: 'Could not create dish',
+      };
+    }
   }
 }
