@@ -22,6 +22,7 @@ import { OrderItem } from './order-item.entity';
 export enum OrderStatus {
   Pending = 'Pending', //대기
   Cooking = 'Cooking', //조리
+  Cooked = 'Cooked', //완성
   PickedUp = 'PickedUp', //픽업
   Delivered = 'Delivered', //배달완료
 }
