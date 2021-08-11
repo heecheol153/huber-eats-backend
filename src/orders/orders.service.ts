@@ -26,5 +26,12 @@ export class OrderService {
         error: 'Resataurant not found',
       };
     }
+    const order = await this.orders.save(
+      this.orders.create({
+        customer,
+        restaurant,
+      }),
+    );
+    console.log(order);
   }
 }
