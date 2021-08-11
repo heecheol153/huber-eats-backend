@@ -2,9 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Dish } from 'src/restaurants/entities/dish.entity';
 import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
-import { User } from 'src/users/entities/user.entity';
+import { User, UserRole } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateOrderInput, CreateOrderOutput } from './dtos/create-order.dto';
+import { GetOrdersInput, GetOrdersOutput } from './dtos/get-orders.dto';
 import { OrderItem } from './entities/order-item.entity';
 import { Order } from './entities/order.entity';
 
@@ -26,6 +27,7 @@ export class OrderService {
     { restaurantId, items }: CreateOrderInput,
   ): Promise<CreateOrderOutput> {
     try {
+      // 1.restaurant찾기.
       const restaurant = await this.restaurants.findOne(restaurantId);
       if (!restaurant) {
         return {
@@ -87,6 +89,50 @@ export class OrderService {
       return {
         ok: false,
         error: 'Could not create order.',
+      };
+    }
+  }
+  //GetOrders
+  async getOrders(
+    user: User,
+    { status }: GetOrdersInput, //status는delivered가 될수도있고 뭐든될수있다.
+  ): Promise<GetOrdersOutput> {
+    try {
+      let orders: Order[];
+      if (user.role === UserRole.Client) {
+        //고객이면
+        orders = await this.orders.find({
+          where: {
+            customer: user,
+          },
+        });
+      } else if (user.role === UserRole.Delivery) {
+        orders = await this.orders.find({
+          where: {
+            driver: user,
+          },
+        });
+      } else if (user.role === UserRole.Owner) {
+        const restaurants = await this.restaurants.find({
+          where: {
+            owner: user,
+          },
+          relations: ['orders'],
+        });
+        //console.log(restaurants.map((restaurant) => restaurant.orders).flat());
+        //는 빈배열을 밖으로 빼준다.빈배열을 제외한다.
+        orders = restaurants.map((restaurant) => restaurant.orders).flat(1);
+        //console.log(orders);
+      }
+      return {
+        //typescript가 오류나지않도록리턴한다.
+        ok: true,
+        orders,
+      };
+    } catch {
+      return {
+        ok: false,
+        error: 'Could not get orders',
       };
     }
   }
