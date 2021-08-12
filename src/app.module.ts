@@ -64,9 +64,13 @@ import { OrderItem } from './orders/entities/order-item.entity';
     GraphQLModule.forRoot({
       installSubscriptionHandlers: true,
       autoSchemaFile: true,
-      context: ({ req }) => {
-        console.log(req);
-        return { user: req['user'] };
+      context: ({ req, connection }) => {
+        //console.log(connection);  req도
+        if (req) {
+          return { user: req['user'] };
+        } else {
+          console.log(connection);
+        }
       },
     }),
     JwtModule.forRoot({

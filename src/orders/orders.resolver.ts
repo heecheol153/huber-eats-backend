@@ -52,9 +52,17 @@ export class OrderResolver {
     return this.ordersService.editOrder(user, editOrderInput);
   }
 
+  @Mutation((returns) => Boolean)
+  potatoReady() {
+    pubsub.publish('hotPotatos', {
+      readyPotato: 'Your potato is ready. love you.',
+    });
+    return true;
+  }
+
   //Subscription decorator에서return하는것, 즉 graphQL에서return값이 String이라는것임.
   @Subscription((returns) => String)
-  hotPotatos() {
+  readyPotato() {
     return pubsub.asyncIterator('hotPotatos');
   }
 }
