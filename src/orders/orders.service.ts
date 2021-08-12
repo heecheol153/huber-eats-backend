@@ -1,12 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PubSub } from 'graphql-subscriptions';
-import { NEW_PENDING_ORDER, PUB_SUB } from 'src/common/common.constants';
+import {
+  NEW_COOKED_ORDER,
+  NEW_PENDING_ORDER,
+  PUB_SUB,
+} from 'src/common/common.constants';
 import { Dish } from 'src/restaurants/entities/dish.entity';
 import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
 import { User, UserRole } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
-import { runInThisContext } from 'vm';
 import { CreateOrderInput, CreateOrderOutput } from './dtos/create-order.dto';
 import { EditOrderInput, EditOrderOutput } from './dtos/edit-order.dto';
 import { GetOrderInput, GetOrderOutput } from './dtos/get-order.dto';
@@ -243,12 +246,20 @@ export class OrderService {
           error: "You can't do that.",
         };
       }
-      await this.orders.save([
-        {
-          id: orderId,
-          status,
-        },
-      ]);
+      const newOrder = await this.orders.save({
+        //      await this.orders.save({
+        id: orderId,
+        status,
+      });
+      if (user.role === UserRole.Owner) {
+        if (status == OrderStatus.Cooked) {
+          //new status of the Order = order status
+          await this.pubSub.publish(NEW_COOKED_ORDER, {
+            cookedOrders: { ...order, status }, //이전order를새status와 보냄
+          });
+        }
+      }
+      console.log(newOrder);
       return {
         ok: true,
       };
