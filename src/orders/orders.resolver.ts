@@ -70,6 +70,8 @@ export class OrderResolver {
     filter: ({ readyPotato }, { potatoId }) => {
       return readyPotato === potatoId; //true이면 사용자가 update알림을 받는다.
     },
+    resolve: ({ readyPotato }) =>
+      `Your potato with the id ${readyPotato} is ready!`,
   })
   @Role(['Any'])
   readyPotato(@Args('potatoId') potaoId: number) {

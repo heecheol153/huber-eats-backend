@@ -8,6 +8,10 @@ The Backend of Huber Eats Clone
 - Orders U\*
 - Orders Subscription (Owner, Customer, Delivery)
 
+  - Pending Orders (Owner) (T: createOrder)
+  - Order Status (Customer, Delivery, Owner) (T: editOrder)
+  - Pending Pickup Order (Delivery)
+
 - Payments (CRON)
 
 - Delete Restaurant\*
