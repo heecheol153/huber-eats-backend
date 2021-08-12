@@ -1,4 +1,5 @@
-import { Args, Mutation, Resolver, Query } from '@nestjs/graphql';
+import { Args, Mutation, Resolver, Query, Subscription } from '@nestjs/graphql';
+import { PubSub } from 'graphql-subscriptions';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { Role } from 'src/auth/role.decorator';
 import { User } from 'src/users/entities/user.entity';
@@ -9,6 +10,7 @@ import { GetOrdersInput, GetOrdersOutput } from './dtos/get-orders.dto';
 import { Order } from './entities/order.entity';
 import { OrderService } from './orders.service';
 
+const pubsub = new PubSub();
 @Resolver((of) => Order)
 export class OrderResolver {
   constructor(private readonly ordersService: OrderService) {}
@@ -48,5 +50,11 @@ export class OrderResolver {
     @Args('input') editOrderInput: EditOrderInput,
   ): Promise<EditOrderOutput> {
     return this.ordersService.editOrder(user, editOrderInput);
+  }
+
+  //Subscription decorator에서return하는것, 즉 graphQL에서return값이 String이라는것임.
+  @Subscription((returns) => String)
+  hotPotatos() {
+    return pubsub.asyncIterator('hotPotatos');
   }
 }
