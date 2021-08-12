@@ -3,7 +3,7 @@ import { Args, Mutation, Resolver, Query, Subscription } from '@nestjs/graphql';
 import { PubSub } from 'graphql-subscriptions';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { Role } from 'src/auth/role.decorator';
-import { PUB_SUB } from 'src/common/common.constants';
+import { NEW_PENDING_ORDER, PUB_SUB } from 'src/common/common.constants';
 import { User } from 'src/users/entities/user.entity';
 import { CreateOrderInput, CreateOrderOutput } from './dtos/create-order.dto';
 import { EditOrderInput, EditOrderOutput } from './dtos/edit-order.dto';
@@ -57,24 +57,15 @@ export class OrderResolver {
     return this.ordersService.editOrder(user, editOrderInput);
   }
 
-  @Mutation((returns) => Boolean)
-  async potatoReady(@Args('potatoId') potatoId: number) {
-    await this.pubSub.publish('hotPotatos', {
-      readyPotato: potatoId, //`Your potato ${potatoId} is ready.`,
-    });
-    return true;
-  }
-
-  //Subscription decorator에서return하는것, 즉 graphQL에서return값이 String이라는것임.
-  @Subscription((returns) => String, {
-    filter: ({ readyPotato }, { potatoId }) => {
-      return readyPotato === potatoId; //true이면 사용자가 update알림을 받는다.
+  @Subscription((returns) => Order, {
+    filter: (payload, _, context) => {
+      //payload,variables는생략,User로 쓸context추가
+      console.log(payload, context);
+      return true;
     },
-    resolve: ({ readyPotato }) =>
-      `Your potato with the id ${readyPotato} is ready!`,
   })
-  @Role(['Any'])
-  readyPotato(@Args('potatoId') potaoId: number) {
-    return this.pubSub.asyncIterator('hotPotatos');
+  @Role(['Owner'])
+  pendingOrders() {
+    return this.pubSub.asyncIterator(NEW_PENDING_ORDER);
   }
 }
