@@ -58,18 +58,21 @@ export class OrderResolver {
   }
 
   @Mutation((returns) => Boolean)
-  potatoReady() {
-    this.pubSub.publish('hotPotatos', {
-      readyPotato: 'Your potato is ready. love you.',
+  async potatoReady(@Args('potatoId') potatoId: number) {
+    await this.pubSub.publish('hotPotatos', {
+      readyPotato: potatoId, //`Your potato ${potatoId} is ready.`,
     });
     return true;
   }
 
   //Subscription decorator에서return하는것, 즉 graphQL에서return값이 String이라는것임.
-  @Subscription((returns) => String)
+  @Subscription((returns) => String, {
+    filter: ({ readyPotato }, { potatoId }) => {
+      return readyPotato === potatoId; //true이면 사용자가 update알림을 받는다.
+    },
+  })
   @Role(['Any'])
-  readyPotato(@AuthUser() user: User) {
-    console.log(user);
+  readyPotato(@Args('potatoId') potaoId: number) {
     return this.pubSub.asyncIterator('hotPotatos');
   }
 }
