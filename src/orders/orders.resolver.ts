@@ -62,7 +62,9 @@ export class OrderResolver {
 
   //Subscription decorator에서return하는것, 즉 graphQL에서return값이 String이라는것임.
   @Subscription((returns) => String)
-  readyPotato() {
+  @Role(['Any'])
+  readyPotato(@AuthUser() user: User) {
+    console.log(user);
     return pubsub.asyncIterator('hotPotatos');
   }
 }
