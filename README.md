@@ -14,7 +14,7 @@ The Backend of Huber Eats Clone
   - Pending Pickup Order (Delivery)\*
   - \*Order Status (Customer, Delivery, Owner)
 
-- - Payments (CRON)
+- - Payments (CRON)\*
 
 - Delete Restaurant\*
 
