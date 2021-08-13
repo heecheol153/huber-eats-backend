@@ -178,6 +178,9 @@ export class RestaurantService {
         where: {
           category,
         },
+        order: {
+          isPromoted: 'DESC',
+        },
         take: 25, //웹사이트에들어갔을때,restaurant를 25개만받는다.
         skip: (page - 1) * 25, //page 2인경우 다음으로나올25개restaurant을 가져온다
       });
@@ -204,6 +207,9 @@ export class RestaurantService {
         //그래서[restaurants, totalResults]로
         skip: (page - 1) * 25,
         take: 25,
+        order: {
+          isPromoted: 'DESC',
+        },
       });
       return {
         ok: true,
