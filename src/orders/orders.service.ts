@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PubSub } from 'graphql-subscriptions';
 import {
   NEW_COOKED_ORDER,
+  NEW_ORDER_UPDATE,
   NEW_PENDING_ORDER,
   PUB_SUB,
 } from 'src/common/common.constants';
@@ -208,9 +209,7 @@ export class OrderService {
     { id: orderId, status }: EditOrderInput,
   ): Promise<EditOrderOutput> {
     try {
-      const order = await this.orders.findOne(orderId, {
-        relations: ['restaurant'],
-      });
+      const order = await this.orders.findOne(orderId);
       if (!order) {
         return {
           ok: false,
@@ -246,20 +245,20 @@ export class OrderService {
           error: "You can't do that.",
         };
       }
-      const newOrder = await this.orders.save({
-        //      await this.orders.save({
+      await this.orders.save({
         id: orderId,
         status,
       });
+      const newOrder = { ...order, status };
       if (user.role === UserRole.Owner) {
         if (status == OrderStatus.Cooked) {
           //new status of the Order = order status
           await this.pubSub.publish(NEW_COOKED_ORDER, {
-            cookedOrders: { ...order, status }, //이전order를새status와 보냄
+            cookedOrders: newOrder,
           });
         }
       }
-      console.log(newOrder);
+      await this.pubSub.publish(NEW_ORDER_UPDATE, { orderUpdates: newOrder });
       return {
         ok: true,
       };
