@@ -6,14 +6,15 @@ The Backend of Huber Eats Clone
 - Edit Dish\*
 - Delete Dish\*
 - Orders U\*
-- Orders Subscription (Owner, Customer, Delivery)
+- Orders Subscription (Owner, Customer, Delivery)\*
+- Add Driver to Order
 
   - Pending Orders (Owner) (T: createOrder)\*
   - Order Status (Customer, Delivery, Owner) (T: editOrder)\*
   - Pending Pickup Order (Delivery)\*
   - \*Order Status (Customer, Delivery, Owner)
 
-- \*Payments (CRON)
+- - Payments (CRON)
 
 - Delete Restaurant\*
 
