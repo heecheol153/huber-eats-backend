@@ -1,9 +1,4 @@
-import {
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  RequestMethod,
-} from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import * as Joi from 'joi';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -11,7 +6,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { User } from './users/entities/user.entity';
 import { JwtModule } from './jwt/jwt.module';
-import { JwtMiddleware } from './jwt/jwt.middleware';
 import { AuthModule } from './auth/auth.module'; //chk
 import { Verification } from './users/entities/verification.entity';
 import { MailModule } from './mail/mail.module';
@@ -45,6 +39,8 @@ import { UploadsModule } from './uploads/uploads.module';
         MAILGUN_API_KEY: Joi.string().required(), //chk0
         MAILGUN_DOMAIN_NAME: Joi.string().required(), //chk0
         MAILGUN_FROM_EMAIL: Joi.string().required(), //chk0
+        AWS_KEY: Joi.string().required(),
+        AWS_SECRET: Joi.string().required(),
       }),
     }),
     TypeOrmModule.forRoot({
@@ -74,6 +70,7 @@ import { UploadsModule } from './uploads/uploads.module';
       context: ({ req, connection }) => {
         //console.log(connection);  req도
         const TOKEN_KEY = 'x-jwt';
+        //console.log(connection?.context[TOKEN_KEY]);
         return {
           token: req ? req.headers[TOKEN_KEY] : connection.context[TOKEN_KEY],
         };
