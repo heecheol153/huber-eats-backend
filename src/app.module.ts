@@ -30,7 +30,7 @@ import { UploadsModule } from './uploads/uploads.module';
       ignoreEnvFile: process.env.NODE_ENV === 'production',
       validationSchema: Joi.object({
         NODE_ENV: Joi.string().valid('dev', 'production', 'test').required(),
-        DB_HOST: Joi.string(),
+        DB_HOST: Joi.string(), //required()가 없는것은 로컬환경에서만 사용한다.
         DB_PORT: Joi.string(),
         DB_USERNAME: Joi.string(),
         DB_PASSWORD: Joi.string(),
@@ -46,7 +46,7 @@ import { UploadsModule } from './uploads/uploads.module';
     TypeOrmModule.forRoot({
       type: 'postgres',
       ...(process.env.DATABASE_URL
-        ? { url: process.env.DATABASE_URL }
+        ? { url: process.env.DATABASE_URL } //Heroku가 제공,자동으로 DATABASE_URL을 제공
         : {
             host: process.env.DB_HOST,
             port: +process.env.DB_PORT,
